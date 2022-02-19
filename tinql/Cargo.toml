@@ -1,0 +1,25 @@
+[package]
+authors = ["Oli Dacombe"]
+edition = "2021"
+name = "tinql"
+homepage = "https://github.com/olidacombe/tinkc"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/olidacombe/tinkc"
+version = "0.1.0"
+
+[dependencies]
+chrono = "0.4.19"
+env_logger = "0.9.0"
+eyre = "0.6.6"
+juniper = "0.15.9"
+juniper_codegen = "0.15.9"
+juniper_warp = "0.7.0"
+log = "0.4.14"
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = "1.0.79"
+thiserror = "1.0.30"
+tinkc = { path = "../tinkc", version = "0.1.0" }
+
+[dev-dependencies]
+tokio = "1.17.0"
+warp = "0.3.2"
