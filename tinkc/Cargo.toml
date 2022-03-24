@@ -1,5 +1,6 @@
 [package]
 authors = ["Oli Dacombe"]
+description = "Tinkerbell tink grpc client wrapper"
 edition = "2021"
 name = "tinkc"
 homepage = "https://github.com/olidacombe/tinkc"

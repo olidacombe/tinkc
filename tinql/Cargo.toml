@@ -1,5 +1,6 @@
 [package]
 authors = ["Oli Dacombe"]
+description = "Tinkerbell GraphQL server wrapping tinkc client"
 edition = "2021"
 name = "tinql"
 homepage = "https://github.com/olidacombe/tinkc"
