@@ -67,7 +67,7 @@ pub struct WorkflowActionStatus {
     seconds: i32,
     created_at: NaiveDateTime,
     message: String,
-    worker_id: String
+    worker_id: String,
 }
 
 impl TryFrom<tinkc::WorkflowActionStatus> for WorkflowActionStatus {
@@ -85,7 +85,7 @@ impl TryFrom<tinkc::WorkflowActionStatus> for WorkflowActionStatus {
             seconds: status.seconds.try_into()?,
             created_at,
             message: status.message,
-            worker_id: status.worker_id
+            worker_id: status.worker_id,
         })
     }
 }
