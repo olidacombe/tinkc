@@ -5,7 +5,7 @@ name = "tinql"
 homepage = "https://github.com/olidacombe/tinkc"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/olidacombe/tinkc"
-version = "0.1.0"
+version = "0.1.1"
 
 [dependencies]
 chrono = "0.4.19"
