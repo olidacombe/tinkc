@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use eyre::Result;
 pub mod grpc;
 pub use grpc::hardware::{self, Hardware, HardwareServiceClient};
@@ -10,16 +11,32 @@ pub struct Tink {
     hardware_client: HardwareServiceClient<Channel>,
 }
 
+#[derive(Clone)]
+pub enum TinkCert<'a> {
+    File(&'a str),
+    Str(&'a str),
+}
+
+#[derive(Builder)]
+pub struct TinkConfig<'a> {
+    endpoint: &'a str,
+    domain: &'a str,
+    cert: TinkCert<'a>,
+}
+
 impl Tink {
-    pub async fn new(endpoint: &str, ca_file: &str, domain: &str) -> Result<Self> {
-        let pem = tokio::fs::read(ca_file).await?;
+    pub async fn new(config: TinkConfig<'_>) -> Result<Self> {
+        let pem = match config.cert {
+            TinkCert::File(cert) => tokio::fs::read(cert).await?,
+            TinkCert::Str(cert) => cert.as_bytes().to_vec(),
+        };
         let ca = Certificate::from_pem(pem);
 
         let tls = ClientTlsConfig::new()
             .ca_certificate(ca)
-            .domain_name(domain);
+            .domain_name(config.domain);
 
-        let channel = Channel::from_shared(endpoint.to_owned())?
+        let channel = Channel::from_shared(config.endpoint.to_owned())?
             .tls_config(tls)?
             .connect()
             .await?;
@@ -87,9 +104,26 @@ impl Tink {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use eyre::Result;
+
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn happy_tink_config_builder_file() -> Result<()> {
+        TinkConfigBuilder::default()
+            .cert(TinkCert::File("ca.crt"))
+            .domain("example.com")
+            .endpoint("localhost:9999")
+            .build()?;
+        Ok(())
+    }
+
+    #[test]
+    fn happy_tink_config_builder_string() -> Result<()> {
+        TinkConfigBuilder::default()
+            .cert(TinkCert::Str("some content"))
+            .domain("example.com")
+            .endpoint("localhost:9999")
+            .build()?;
+        Ok(())
     }
 }

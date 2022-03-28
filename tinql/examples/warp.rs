@@ -1,5 +1,5 @@
 use eyre::Result;
-use tinkc::Tink;
+use tinkc::{Tink, TinkCert, TinkConfigBuilder};
 use tinql::{schema, Context};
 use warp::{http::Response, Filter};
 
@@ -21,9 +21,11 @@ async fn main() -> Result<()> {
     log::info!("Listening on 127.0.0.1:8080");
 
     let tink = Tink::new(
-        "http://[::1]:42113",
-        "tinkc/examples/data/tls/ca.pem",
-        "localhost",
+        TinkConfigBuilder::default()
+            .endpoint("http://[::1]:42113")
+            .cert(TinkCert::File("tinkc/examples/data/tls/ca.pem"))
+            .domain("localhost")
+            .build()?,
     )
     .await?;
     let context = Context::new(tink);
