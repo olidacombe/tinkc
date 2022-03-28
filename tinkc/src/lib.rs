@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use eyre::Result;
 pub mod grpc;
 pub use grpc::hardware::{self, Hardware, HardwareServiceClient};
@@ -8,6 +9,18 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 pub struct Tink {
     workflow_client: WorkflowServiceClient<Channel>,
     hardware_client: HardwareServiceClient<Channel>,
+}
+
+#[derive(Clone)]
+enum TinkCert<'a> {
+    File(&'a str),
+    Str(&'a str),
+}
+
+#[derive(Builder)]
+struct TinkConfig<'a> {
+    domain: &'a str,
+    cert: TinkCert<'a>,
 }
 
 impl Tink {
@@ -87,9 +100,24 @@ impl Tink {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use eyre::Result;
+
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn happy_tink_config_builder_file() -> Result<()> {
+        TinkConfigBuilder::default()
+            .domain("example.com")
+            .cert(TinkCert::File("ca.crt"))
+            .build()?;
+        Ok(())
+    }
+
+    #[test]
+    fn happy_tink_config_builder_string() -> Result<()> {
+        TinkConfigBuilder::default()
+            .domain("example.com")
+            .cert(TinkCert::Str("some content"))
+            .build()?;
+        Ok(())
     }
 }
