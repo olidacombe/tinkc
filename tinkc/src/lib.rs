@@ -15,6 +15,7 @@ pub struct Tink {
 pub enum TinkCert<'a> {
     File(&'a str),
     Str(&'a str),
+    Vec(Vec<u8>),
 }
 
 #[derive(Builder)]
@@ -29,6 +30,7 @@ impl Tink {
         let pem = match config.cert {
             TinkCert::File(cert) => tokio::fs::read(cert).await?,
             TinkCert::Str(cert) => cert.as_bytes().to_vec(),
+            TinkCert::Vec(cert) => cert,
         };
         let ca = Certificate::from_pem(pem);
 
