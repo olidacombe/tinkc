@@ -44,6 +44,15 @@ impl Query {
         let mut tink = context.tink.as_ref().clone();
         Ok(tink.hardware().await?)
     }
+
+    async fn hardware_from_mac<'ctx>(
+        &self,
+        context: &'ctx Context,
+        mac: String,
+    ) -> FieldResult<Hardware> {
+        let mut tink = context.tink.as_ref().clone();
+        Ok(tink.hardware_from_mac(mac).await?)
+    }
 }
 
 pub type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
