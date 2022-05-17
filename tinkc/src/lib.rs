@@ -1,8 +1,10 @@
 use derive_builder::Builder;
-use eyre::Result;
+use eyre::{eyre, Result};
 pub mod grpc;
-pub use grpc::hardware::{self, Hardware, HardwareServiceClient};
-pub use grpc::workflow::{self, GetRequest, Workflow, WorkflowActionStatus, WorkflowServiceClient};
+pub use grpc::hardware::{self, GetRequest as HardwareGetRequest, Hardware, HardwareServiceClient};
+pub use grpc::workflow::{
+    self, GetRequest as WorkflowGetRequest, Workflow, WorkflowActionStatus, WorkflowServiceClient,
+};
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
 #[derive(Clone)]
@@ -73,7 +75,7 @@ impl Tink {
     {
         let mut stats = self
             .workflow_client
-            .show_workflow_events(GetRequest { id })
+            .show_workflow_events(WorkflowGetRequest { id })
             .await?
             .into_inner();
         let mut resolved = Vec::<T>::new();
@@ -101,6 +103,24 @@ impl Tink {
             }
         }
         Ok(resolved)
+    }
+
+    pub async fn hardware_from_mac<T>(&mut self, mac: String) -> Result<T>
+    where
+        T: TryFrom<Hardware>,
+    {
+        let response = self
+            .hardware_client
+            .by_mac(HardwareGetRequest {
+                mac,
+                id: "".to_string(),
+                ip: "".to_string(),
+            })
+            .await?;
+        response
+            .into_inner()
+            .try_into()
+            .map_err(|_| eyre!("Hardware From MAC Failed"))
     }
 }
 
