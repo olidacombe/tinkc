@@ -6,7 +6,7 @@ name = "tinkc"
 homepage = "https://github.com/olidacombe/tinkc"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/olidacombe/tinkc"
-version = "0.1.5"
+version = "0.1.6"
 
 [dependencies]
 eyre = "0.6.6"
